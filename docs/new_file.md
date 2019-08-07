@@ -505,3 +505,20 @@ The order of column names in the `\COPY` command has to be exactly the same as t
 ### 4. Complete
 
 You are done with the database migration. Now you can follow [Installation](#Installation).
+
+## Updates
+
+### 1.3.x to 1.7.5 
+
+#### New Environment Variable
+
+```
+# Default toobusy response lag time (ms)
+- HMD_RESPONSE_MAX_LAG: "70"
+# Enable account lock down when sign-in attempts fail too many times
+- HMD_LOCKABLE_ACCOUNT_ENABLE: "true"
+# Time interval of failed sign-in attempts (in seconds)
+- HMD_LOCKABLE_ACCOUNT_UNLOCK_IN: "900"
+# Number of times of allowed failed sign-in attempts
+HMD_LOCKABLE_ACCOUNT_MAX_ATTEMPTS: "10"
+```

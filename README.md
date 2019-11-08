@@ -1,135 +1,91 @@
-Aardvark
-========
-[![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/osstracker.svg)]()
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/netflix-repokid)
+# L0 Register
 
-<img align="center" alt="Aardvark Logo" src="docs/images/aardvark_logo.jpg" width="10%" display="block">
-
-Aardvark is a multi-account AWS IAM Access Advisor API (and caching layer).
-
-Aardvark uses PhantomJS to log into the AWS Console and obtain access advisor data.  It then presents a RESTful API for other apps to query.
-
-## Install:
-
-```bash
-mkvirtualenv aardvark
-git clone git@github.com:Netflix-Skunkworks/aardvark.git
-cd aardvark
-python setup.py develop
-```
-
-### Known Dependencies
- - [PhantomJS*](http://phantomjs.org/download.html)
- - libpq-dev
- 
-**Note**: Aardvark requires at least phantomjs 2.1.1.  We've seen odd behavior running with older versions.
-
-## Configure Aardvark
-
-The Aardvark config wizard will guide you through the setup.
-```
-% aardvark config
-
-Aardvark can use SWAG to look up accounts. https://github.com/Netflix-Skunkworks/swag-client
-Do you use SWAG to track accounts? [yN]: no
-ROLENAME: Aardvark
-DATABASE [sqlite:////home/github/aardvark/aardvark.db]:
-# Threads [5]: 
-Path to phantomjs: 
-
->> Writing to config.py
-```
-- Whether to use [SWAG](https://github.com/Netflix-Skunkworks/swag-client) to enumerate your AWS accounts. (Optional, but useful when you have many accounts.)
-- The name of the IAM Role to assume into in each account.
-- The Database connection string. (Defaults to sqlite in the current working directory. Use RDS Postgres for production.)
-- Location of the PhantomJS executable. (Will attempt to find `phantomjs` in your path before asking.)  Ensure it is at least `v2.1.1`.
-
-## Create the DB tables
-
-```
-aardvark create_db
-```
-
-## IAM Permissions:
-
-Aardvark needs an IAM Role in each account that will be queried.  Additionally, Aardvark needs to be launched with a role or user which can `sts:AssumeRole` into the different account roles.
-
-AardvarkInstanceProfile:
-- Only create one.
-- Needs the ability to call `sts:AssumeRole` into all of the AardvarkRole's
-
-AardvarkRole:
-- Must exist in every account to be monitored.
-- Must have a trust policy allowing `AardvarkInstanceProfile`.
-- Has these permissions:
-```
-iam:GenerateServiceLastAccessedDetails
-iam:GetServiceLastAccessedDetails
-iam:listrolepolicies
-iam:listroles
-iam:ListUsers
-iam:ListPolicies
-iam:ListGroups
-```
-
-So if you are monitoring `n` accounts, you will always need `n+1` roles. (`n` AardvarkRoles and `1` AardvarkInstanceProfile).
-
-## Gather Access Advisor Data
-
-You'll likely want to refresh the Access Advisor data regularly.  We recommend running the `update` command about once a day.  Cron works great for this.
-
-#### Without SWAG:
-
-If you don't have SWAG you can pass comma separated account numbers:
-
-    aardvark update -a 123456789012,210987654321
-
-#### With SWAG:
-
-Aardvark can use [SWAG](https://github.com/Netflix-Skunkworks/swag-client) to look up accounts, so you can run against all with:
-
-    aardvark update
-
-or by account name/tag with:
-
-    aardvark update -a dev,test,prod
+- Financial Model
+    - Roadmap & Inflection points
+        - 如何預算 Sales
+        - 
+    - Market breakdown & takeover ambition
 
 
-## API
 
-### Start the API
+| Column 1 | Column 2 |     |     | Column 3 |
+| -------- | -------- | --- | --- | -------- |
+| Text     | Text     |     |     | Text     |
+|          |          |     |     | hi       |
+|          |          |     |     |          |
 
-    aardvark start_api -b 0.0.0.0:5000
 
-In production, you'll likely want to have something like supervisor starting the API for you.
+- 有軒 股票處理
+    - 文件閱讀
+- 日本業務 Deck
+    - Existing customers
+    - Value proposition & a day in the life (interaction with GitHub)
+    - Software NDA
+- O-1 Visa
+    - [x] DS-160
+    - [x] I-129
+    - [ ] 領事館預約
+- 投票申請
+    - [x] 打電話問內政部戶政司
 
-### Use the API
+- 付費
+    - [x] Anelya
+    - [-] Stephen
+    - [x] 停車票
+- [MOSS](https://www.mozilla.org/en-US/moss/foundational-technology/)
+    - [x] 寄檔案給 Gene
+    - 填寫 Grant 申請表
 
-Swagger is available for the API at `<Aardvark_Host>/apidocs/#!`.
+- Team 文案
+    - 團隊教學
+    - 表格教學翻譯
+    - 首頁範本
+    - 通知信
+    - 付費的催繳信
+    - Email 行銷 campaign
+- [x] 國網中心報價
 
-Aardvark responds to get/post requests. All results are paginated and pagination can be controlled by passing `count` and/or `page` arguments. Here are a few example queries:
-```bash
-curl localhost:5000/api/1/advisors
-curl localhost:5000/api/1/advisors?phrase=SecurityMonkey
-curl localhost:5000/api/1/advisors?arn=arn:aws:iam::000000000000:role/SecurityMonkey&arn=arn:aws:iam::111111111111:role/SecurityMonkey
-curl localhost:5000/api/1/advisors?regex=^.*Monkey$
-```
+- VC list
+    - deduplicate 出幾個 VC
+    - 舊的 VC & Angel 名單整理
 
-## Notes
+- 進入宣傳期
+    - Demo -> Enterprise
+    - 
 
-### Threads
-Aardvark will launch the number of threads specified in the configuration.  Each of these threads
-will launch a PhantomJS process to retrieve Access Advisor data for an account and then persist the
-data.  We have discovered in testing that more than `6` threads causes the Phantom processes to fail
-to complete.
 
-### Database
-The `regex` query is only supported in Postgres (natively) and SQLite (via some magic courtesy of Xion
-  in the `sqla_regex` file).
 
-### TLS
-We recommend enabling TLS for any service. Instructions for setting up TLS are out of scope for this document.
+[HackMD] Team plan 
 
-## TODO:
+Hi Edwin, 
 
-See [TODO](TODO.md)
+This is Jongkai from HackMD. How are you?
+
+To make HackMD a viable and sustainable service, we're beta launching our first paid plan, the [**Team Plan**](https://hackmd.io/pricing), which not only allows you to have more than 3 team members, but focuses on better privacy and permission controls (role-based access control and private image storge). I hope you could support us by [**upgrading the Terminal1 team to the Team Plan**](https://hackmd.io/team/terminal1?nav=billing) within the next two weeks.
+
+We have been working diligently on increasing the value HackMD provides to you, and I hope you've found our recent features: [**Browser Extension: HackMD-it**](https://hackmd.io/c/tutorials/%2Fs%2Fhackmd-it), [**GitHub integration**](https://hackmd.io/c/tutorials/%2Fs%2Flink-with-github), and [**private invitation**](https://hackmd.io/c/tutorials/%2Fs%2Finvite) useful.
+
+With your support, we will be able to continue adding more exclusive features to the Team Plan for you. If you don't want to subscribe for now, please feel free to share your concerns with me.
+
+Thank you for your support again and I'd love to hear your thoughts. Any idea would be highly appreciated.
+
+Thanks and best regards,
+
+[HackMD] 團隊方案
+
+嗨 __
+
+我是 HackMD 的宗鎧，好久不見！您好嗎？
+為了讓產品和團隊能夠長遠地經營下去，我們最近發布了我們的第一個付費方案－－[**團隊方案**](https://hackmd.io/pricing)！
+
+團隊方案的訂閱者除了可以增加團隊成員上限超過三人之外，更增加了注重隱私及權限控管（例如：私人圖床等）的功能。
+
+感謝您之前對於團隊功能的試用，希望有幫助到您的團隊協作。如果您覺得團隊功能對您有價值的話，希望您可以支持我們，並在兩週內[**升級 _____　以使用團隊方案**](https://hackmd.io/team/terminal1?nav=billing)！
+
+HackMD 團隊一直非常努力地開發產品，以讓您的協作更方便。希望您喜歡我們最近發布的幾個新功能：[**HackMD-it 瀏覽器擴充功能**](https://hackmd.io/c/tutorials-tw/%2Fs%2Fhackmd-it-tw)、[**GitHub 同步**](https://hackmd.io/c/tutorials-tw/%2Fs%2Flink-with-github-tw)、和 [**邀請到私人筆記**](https://hackmd.io/c/tutorials-tw/%2Fs%2Finvite-tw)！
+
+在您的支持下，HackMD 團隊一定能繼續將產品開發得更完善，讓您覺得更好用！如果您目前沒有付費升級的意願，也請務必讓我們知道您的想法？
+
+再次感謝您的支持，如果有任何想法都請務必讓我知道，我很想聽聽您的意見。
+
+謝謝！
